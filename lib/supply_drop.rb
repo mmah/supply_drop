@@ -32,6 +32,15 @@ Capistrano::Configuration.instance.load do
       end
     end
 
+    desc "installs puppet via apt on an rhel host"
+      task :rhel6 do
+        run "mkdir -p #{puppet_destination}"
+        run "#{sudo} rpm -ivh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm"
+        run "#{sudo} yum install -y ruby dmidecode ruby-shadow ruby-augeas libselinux-ruby rsync"
+        run "#{sudo} rpm -ivh 'http://yum.puppetlabs.com/el/6/products/i386/facter-1.6.5-1.el6.noarch.rpm'"
+        run "#{sudo} rpm -ivh 'http://yum.puppetlabs.com/el/6Client/products/i386/puppet-2.7.10-1.el6.noarch.rpm'"
+      end
+
     desc "pushes the current puppet configuration to the server"
     task :update_code, :except => { :nopuppet => true } do
       servers = SupplyDrop::Util.optionally_async(find_servers_for_task(current_task), puppet_parallel_rsync)
