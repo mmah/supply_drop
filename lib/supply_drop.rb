@@ -1,6 +1,6 @@
-require 'supply_drop/rsync'
-require 'supply_drop/async_enumerable'
-require 'supply_drop/util'
+require './supply_drop/lib/supply_drop/rsync'
+require './supply_drop/lib/supply_drop/async_enumerable'
+require './supply_drop/lib/supply_drop/util'
 
 Capistrano::Configuration.instance.load do
   namespace :puppet do
@@ -30,9 +30,8 @@ Capistrano::Configuration.instance.load do
         run "#{sudo} apt-get update"
         run "#{sudo} apt-get install -y puppet rsync"
       end
-    end
-
-    desc "installs puppet via apt on an rhel host"
+      
+      desc "installs puppet via apt on an rhel host"
       task :rhel6 do
         run "mkdir -p #{puppet_destination}"
         run "#{sudo} rpm -ivh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm"
@@ -40,6 +39,7 @@ Capistrano::Configuration.instance.load do
         run "#{sudo} rpm -ivh 'http://yum.puppetlabs.com/el/6/products/i386/facter-1.6.5-1.el6.noarch.rpm'"
         run "#{sudo} rpm -ivh 'http://yum.puppetlabs.com/el/6Client/products/i386/puppet-2.7.10-1.el6.noarch.rpm'"
       end
+    end
 
     desc "pushes the current puppet configuration to the server"
     task :update_code, :except => { :nopuppet => true } do
