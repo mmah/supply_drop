@@ -1,6 +1,13 @@
 require './supply_drop/lib/supply_drop/rsync'
 require './supply_drop/lib/supply_drop/async_enumerable'
 require './supply_drop/lib/supply_drop/util'
+require 'supply_drop/rsync'
+require 'supply_drop/async_enumerable'
+require 'supply_drop/syntax_checker'
+require 'supply_drop/util'
+require 'supply_drop/writer/batched'
+require 'supply_drop/writer/file'
+require 'supply_drop/writer/streaming'
 
 Capistrano::Configuration.instance.load do
   namespace :puppet do
@@ -13,6 +20,8 @@ Capistrano::Configuration.instance.load do
     set :puppet_excludes, %w(.git .svn)
     set :puppet_stream_output, false
     set :puppet_parallel_rsync, true
+    set :puppet_syntax_check, true
+    set :puppet_write_to_file, nil
 
     namespace :bootstrap do
       desc "installs puppet via rubygems on an osx host"
@@ -54,6 +63,30 @@ Capistrano::Configuration.instance.load do
         run "#{sudo} yum install -y ruby rubygems"
         run "${sudo} gem install puppet"
       end
+
+      desc "installs puppet via yum on a centos/red hat host"
+      task :redhat do
+        run "mkdir -p #{puppet_destination}"
+        run "#{sudo} yum -y install puppet rsync"
+      end
+    end
+
+    desc "checks the syntax of all *.pp and *.erb files"
+    task :syntax_check do
+      checker = SupplyDrop::SyntaxChecker.new(puppet_source)
+      logger.info "Sytax Checking..."
+      errors = false
+      checker.validate_puppet_files.each do |file, error|
+        logger.important "Puppet error: #{file}"
+        logger.important error
+        errors = true
+      end
+      checker.validate_templates.each do |file, error|
+        logger.important "Template error: #{file}"
+        logger.important error
+        errors = true
+      end
+      raise "syntax errors" if errors
     end
 
     desc "pushes the current puppet configuration to the server"
@@ -74,6 +107,10 @@ Capistrano::Configuration.instance.load do
       raise "rsync failed on #{failed_servers.join(',')}" if failed_servers.any?
     end
 
+    before :'puppet:update_code' do
+      syntax_check if puppet_syntax_check
+    end
+
     desc "runs puppet with --noop flag to show changes"
     task :noop, :except => { :nopuppet => true } do
       update_code
@@ -92,25 +129,21 @@ Capistrano::Configuration.instance.load do
     puppet_cmd = "cd #{puppet_destination} && #{sudo_cmd} #{puppet_command} --modulepath=#{puppet_lib} #{puppet_parameters}"
     flag = command == :noop ? '--noop' : ''
 
-    outputs = {}
+    writer = if puppet_stream_output
+               SupplyDrop::Writer::Streaming.new(logger)
+             else
+               SupplyDrop::Writer::Batched.new(logger)
+             end
+
+    writer = SupplyDrop::Writer::File.new(writer, puppet_write_to_file) unless puppet_write_to_file.nil?
+
     begin
       run "#{puppet_cmd} #{flag}" do |channel, stream, data|
-        if puppet_stream_output
-          print data
-          $stdout.flush
-        else
-          outputs[channel[:host]] ||= ""
-          outputs[channel[:host]] << data
-        end
+        writer.collect_output(channel[:host], data)
       end
       logger.debug "Puppet #{command} complete."
     ensure
-      unless puppet_stream_output
-        outputs.each_pair do |host, output|
-          logger.info "Puppet output for #{host}"
-          logger.debug output, "#{host}"
-        end
-      end
+      writer.all_output_collected
     end
   end
 end

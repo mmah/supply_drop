@@ -19,6 +19,7 @@ then at the top of your deploy.rb
 
     cap puppet:bootstrap:ubuntu
     cap puppet:bootstrap:osx
+    cap puppet:bootstrap:redhat
 
 This does a simple apt-get install of puppet on the target servers.
 
@@ -29,6 +30,11 @@ This will show you a list of the pending changes to be applied server-by-server.
     cap puppet:apply
 
 Applies the pending changes to all the servers.
+
+    cap puppet:syntax_check
+
+Locally syntax checks all the puppet files and erb templates. Requires you to have puppet installed locally.
+
 
 You can specify that one of your servers should not be puppeted by setting the :nopuppet flag to true, like so. It will then be skipped by all the above commands.
 
@@ -66,6 +72,13 @@ these are patterns that are passed as rsync --exclude flags when pushing your pu
 
 determines whether the rsync commands for multiple servers are run in parallel threads or serially
 
+    set :puppet_syntax_check, true
+
+when true, will syntax check your puppet files and erb templates before rsyncing them to your servers.
+
+    set :puppet_write_to_file, nil
+
+a file to additionally write puppet output to, useful for large noops with small scrollbacks.
 
 ### Handling Legacy Puppet
 
