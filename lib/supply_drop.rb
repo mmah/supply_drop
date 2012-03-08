@@ -35,18 +35,24 @@ Capistrano::Configuration.instance.load do
       task :rhel6 do
         run "mkdir -p #{puppet_destination}"
         run "#{sudo} rpm -ivh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm"
-        run "#{sudo} yum install -y ruby dmidecode ruby-shadow ruby-augeas libselinux-ruby rsync"
-        run "#{sudo} rpm -ivh 'http://yum.puppetlabs.com/el/6/products/i386/facter-1.6.5-1.el6.noarch.rpm'"
-        run "#{sudo} rpm -ivh 'http://yum.puppetlabs.com/el/6Client/products/i386/puppet-2.7.10-1.el6.noarch.rpm'"
+        run "#{sudo} yum install -y ruby rubygems"
+        run "${sudo} gem install puppet"
       end
       
       desc "installs puppet via apt on an rhel host"
       task :rhel5 do
         run "mkdir -p #{puppet_destination}"
         run "#{sudo} rpm -ivh http://dl.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm"
-        run "#{sudo} yum install -y ruby dmidecode ruby-shadow ruby-augeas libselinux-ruby rsync rpm-devel"
-        run "#{sudo} rpm -ivh 'http://yum.puppetlabs.com/el/5/products/i386/facter-1.6.5-1.el5.noarch.rpm'"
-        run "#{sudo} rpm -ivh 'http://yum.puppetlabs.com/el/5/products/i386/puppet-2.7.10-1.el5.noarch.rpm'"
+        run "#{sudo} yum install -y ruby rubygems"
+        run "${sudo} gem install puppet"
+      end
+
+      desc "installs puppet via apt on an rhel host"
+      task :centos6 do
+        run "mkdir -p #{puppet_destination}"
+        run "#{sudo} rpm -ivh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm"
+        run "#{sudo} yum install -y ruby rubygems"
+        run "${sudo} gem install puppet"
       end
     end
 
