@@ -1,13 +1,13 @@
 require './supply_drop/lib/supply_drop/rsync'
 require './supply_drop/lib/supply_drop/async_enumerable'
 require './supply_drop/lib/supply_drop/util'
-require 'supply_drop/rsync'
-require 'supply_drop/async_enumerable'
-require 'supply_drop/syntax_checker'
-require 'supply_drop/util'
-require 'supply_drop/writer/batched'
-require 'supply_drop/writer/file'
-require 'supply_drop/writer/streaming'
+#require 'supply_drop/rsync'
+#require 'supply_drop/async_enumerable'
+require './supply_drop/lib/supply_drop/syntax_checker'
+#require 'supply_drop/util'
+require './supply_drop/lib/supply_drop/writer/batched'
+require './supply_drop/lib/supply_drop/writer/file'
+require './supply_drop/lib/supply_drop/writer/streaming'
 
 Capistrano::Configuration.instance.load do
   namespace :puppet do
@@ -45,7 +45,7 @@ Capistrano::Configuration.instance.load do
         run "mkdir -p #{puppet_destination}"
         run "#{sudo} rpm -ivh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm"
         run "#{sudo} yum install -y ruby rubygems"
-        run "${sudo} gem install puppet"
+        run "#{sudo} gem install puppet"
       end
       
       desc "installs puppet via apt on an rhel host"
@@ -53,21 +53,15 @@ Capistrano::Configuration.instance.load do
         run "mkdir -p #{puppet_destination}"
         run "#{sudo} rpm -ivh http://dl.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm"
         run "#{sudo} yum install -y ruby rubygems"
-        run "${sudo} gem install puppet"
+        run "#{sudo} gem install puppet"
       end
 
       desc "installs puppet via apt on an rhel host"
       task :centos6 do
-        run "mkdir -p #{puppet_destination}"
-        run "#{sudo} rpm -ivh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm"
-        run "#{sudo} yum install -y ruby rubygems"
-        run "${sudo} gem install puppet"
-      end
-
-      desc "installs puppet via yum on a centos/red hat host"
-      task :redhat do
-        run "mkdir -p #{puppet_destination}"
-        run "#{sudo} yum -y install puppet rsync"
+        #run "mkdir -p #{puppet_destination}"
+        #run "#{sudo} rpm -ivh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm"
+        #run "#{sudo} yum install -y ruby rubygems"
+        run "#{sudo} gem install puppet"
       end
     end
 
