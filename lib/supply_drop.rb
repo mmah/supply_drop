@@ -43,7 +43,7 @@ Capistrano::Configuration.instance.load do
       desc "installs puppet via apt on an rhel host"
       task :rhel6 do
         run "mkdir -p #{puppet_destination}"
-        run "#{sudo} rpm -ivh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm"
+        #run "#{sudo} rpm -ivh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm"
         run "#{sudo} yum install -y ruby rubygems"
         run "#{sudo} gem install puppet"
       end
@@ -58,9 +58,9 @@ Capistrano::Configuration.instance.load do
 
       desc "installs puppet via apt on an rhel host"
       task :centos6 do
-        #run "mkdir -p #{puppet_destination}"
-        #run "#{sudo} rpm -ivh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm"
-        #run "#{sudo} yum install -y ruby rubygems"
+        run "mkdir -p #{puppet_destination}"
+        run "#{sudo} rpm -ivh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-5.noarch.rpm"
+        run "#{sudo} yum install -y ruby rubygems"
         run "#{sudo} gem install puppet"
       end
     end
