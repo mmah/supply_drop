@@ -1,13 +1,10 @@
-require './supply_drop/lib/supply_drop/rsync'
-require './supply_drop/lib/supply_drop/async_enumerable'
-require './supply_drop/lib/supply_drop/util'
-#require 'supply_drop/rsync'
-#require 'supply_drop/async_enumerable'
-require './supply_drop/lib/supply_drop/syntax_checker'
-#require 'supply_drop/util'
-require './supply_drop/lib/supply_drop/writer/batched'
-require './supply_drop/lib/supply_drop/writer/file'
-require './supply_drop/lib/supply_drop/writer/streaming'
+require 'supply_drop/rsync'
+require 'supply_drop/async_enumerable'
+require 'supply_drop/syntax_checker'
+require 'supply_drop/util'
+require 'supply_drop/writer/batched'
+require 'supply_drop/writer/file'
+require 'supply_drop/writer/streaming'
 
 Capistrano::Configuration.instance.load do
   namespace :puppet do
